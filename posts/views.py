@@ -7,6 +7,7 @@ from comentarios.forms import FormComentario
 from comentarios.models import Comentario
 from django.contrib import messages
 
+
 class PostIndex(ListView):
     model = Post
     template_name = 'posts/index.html'
@@ -15,6 +16,7 @@ class PostIndex(ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        queryset = queryset.select_related('categoria_post')
         queryset = queryset.order_by('-id').filter(publicado_post=True)
         queryset = queryset.annotate(
             numero_comentarios=Count(
@@ -46,6 +48,7 @@ class PostBusca(PostIndex):
         )
 
         return queryset
+
 
 class PostCategoria(PostIndex):
     template_name = 'posts/post_categoria.html'
@@ -85,5 +88,3 @@ class PostDetalhes(UpdateView):
         comentario.save()
         messages.success(self.request, 'Comentário enviado com sucesso!')
         return redirect('post_detalhes', pk=post.id)
-
-
